@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
 import {
   Card,
@@ -158,96 +159,103 @@ export default function TicketDetailScreen({ user }: TicketDetailScreenProps) {
   const priorityTextColor = isColorLight(priorityColor) ? '#000' : '#FFF';
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContent}>
-      <Surface style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.titleContainer}>
-            <Title style={styles.title}>{ticket.title}</Title>
-            <View style={styles.metaContainer}>
-              <Chip 
-                icon={() => <MaterialCommunityIcons name={getCategoryIcon(ticket.category)} size={16} color={categoryTextColor} />} 
-                style={[styles.categoryChip, { backgroundColor: categoryColor }]}
-                textStyle={[styles.chipText, { color: categoryTextColor }]}
-                compact
-              >
-                {TICKET_CATEGORIES.find(c => c.value === ticket.category)?.label}
-              </Chip>
-              <Chip 
-                style={[styles.statusChip, { backgroundColor: statusColor }]}
-                textStyle={[styles.chipText, { color: statusTextColor }]}
-                compact
-              >
-                {TICKET_STATUSES.find(s => s.value === ticket.status)?.label}
-              </Chip>
-              <Chip 
-                style={[styles.priorityChip, { backgroundColor: priorityColor }]}
-                textStyle={[styles.chipText, { color: priorityTextColor }]}
-                compact
-              >
-                {ticket.priority.toUpperCase()}
-              </Chip>
+    <View style={styles.mainContainer}>
+      <ScrollView 
+        style={styles.scrollView} 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={true}
+      >
+        <Surface style={styles.header}>
+          <View style={styles.headerContent}>
+            <View style={styles.titleContainer}>
+              <Title style={styles.title}>{ticket.title}</Title>
+              <View style={styles.metaContainer}>
+                <Chip 
+                  icon={() => <MaterialCommunityIcons name={getCategoryIcon(ticket.category)} size={16} color={categoryTextColor} />} 
+                  style={[styles.categoryChip, { backgroundColor: categoryColor }]}
+                  textStyle={[styles.chipText, { color: categoryTextColor }]}
+                  compact
+                >
+                  {TICKET_CATEGORIES.find(c => c.value === ticket.category)?.label}
+                </Chip>
+                <Chip 
+                  style={[styles.statusChip, { backgroundColor: statusColor }]}
+                  textStyle={[styles.chipText, { color: statusTextColor }]}
+                  compact
+                >
+                  {TICKET_STATUSES.find(s => s.value === ticket.status)?.label}
+                </Chip>
+                <Chip 
+                  style={[styles.priorityChip, { backgroundColor: priorityColor }]}
+                  textStyle={[styles.chipText, { color: priorityTextColor }]}
+                  compact
+                >
+                  {ticket.priority.toUpperCase()}
+                </Chip>
+              </View>
             </View>
           </View>
-        </View>
-      </Surface>
+        </Surface>
 
-      <Card style={styles.card}>
-        <Card.Content>
-          <Title style={styles.sectionTitle}>Descripción</Title>
-          <Paragraph style={styles.description}>{ticket.description}</Paragraph>
-          <Divider style={styles.divider} />
-          <Title style={styles.sectionTitle}>Información</Title>
-          <View style={styles.infoGrid}>
-            <View style={styles.infoItem}><MaterialCommunityIcons name="map-marker-outline" size={16} color="#666" /><Text style={styles.infoLabel}>Ubicación:</Text><Text style={styles.infoValue}>{ticket.location || 'No especificada'}</Text></View>
-            <View style={styles.infoItem}><MaterialCommunityIcons name="calendar-outline" size={16} color="#666" /><Text style={styles.infoLabel}>Creado:</Text><Text style={styles.infoValue}>{formatDate(ticket.createdAt)}</Text></View>
-            <View style={styles.infoItem}><MaterialCommunityIcons name="account-outline" size={16} color="#666" /><Text style={styles.infoLabel}>Creado por:</Text><Text style={styles.infoValue}>{ticket.createdByName}</Text></View>
-          </View>
-        </Card.Content>
-      </Card>
-
-      <Card style={styles.card}>
-        <Card.Content>
-          <Title style={styles.sectionTitle}>Comentarios ({comments.length})</Title>
-          {comments.length === 0 ? <View style={styles.emptyComments}><MaterialCommunityIcons name="comment-multiple-outline" size={32} color="#ccc" /><Text style={styles.emptyCommentsText}>No hay comentarios</Text></View> : comments.map(c => (
-            <View key={c.id} style={styles.commentItem}>
-              <View style={styles.commentHeader}><Avatar.Text size={32} label={c.userName.charAt(0)} /><View style={styles.commentInfo}><Text style={styles.commentAuthor}>{c.userName}</Text><Text style={styles.commentDate}>{formatDate(c.createdAt)}</Text></View></View>
-              <Paragraph style={styles.commentContent}>{c.content}</Paragraph>
-            </View>
-          ))}
-          <Divider style={styles.divider} />
-          <View style={styles.addCommentContainer}>
-            <TextInput label="Agregar comentario" value={newComment} onChangeText={setNewComment} mode="outlined" multiline numberOfLines={3} style={styles.commentInput} />
-            <Button mode="contained" onPress={handleAddComment} loading={isAddingComment} disabled={!newComment.trim() || isAddingComment} style={styles.addCommentButton}>Agregar</Button>
-          </View>
-        </Card.Content>
-      </Card>
-
-      {user?.role === 'admin' && (
         <Card style={styles.card}>
           <Card.Content>
-            <Title style={styles.cardTitle}>Acciones de Administrador</Title>
-            <View style={styles.actionGrid}>
-                <Menu
-                    visible={priorityMenuVisible}
-                    onDismiss={() => setPriorityMenuVisible(false)}
-                    anchor={<Button mode="outlined" onPress={() => setPriorityMenuVisible(true)} icon="arrow-up-circle-outline" style={styles.actionButton} textColor="#2E7D32">Prioridad: {ticket.priority}</Button>}
-                >
-                    {TICKET_PRIORITIES.map(p => <Menu.Item key={p.value} onPress={() => { handleUpdate({ priority: p.value }); setPriorityMenuVisible(false);}} title={p.label} />)}
-                </Menu>
-                {ticket.status !== 'resolved' && <Button mode="contained" onPress={() => handleUpdate({ status: 'resolved' })} style={[styles.actionButton, {backgroundColor: '#1B5E20'}]} icon="check" textColor="white">Resolver</Button>}
-                {ticket.status !== 'in_progress' && <Button mode="outlined" onPress={() => handleUpdate({ status: 'in_progress' })} style={styles.actionButton} icon="play" textColor="#2E7D32">En Progreso</Button>}
-                <Button mode="outlined" onPress={handleDelete} style={[styles.actionButton, styles.deleteButton]} icon="trash-can-outline" textColor="#B00020">Eliminar</Button>
+            <Title style={styles.sectionTitle}>Descripción</Title>
+            <Paragraph style={styles.description}>{ticket.description}</Paragraph>
+            <Divider style={styles.divider} />
+            <Title style={styles.sectionTitle}>Información</Title>
+            <View style={styles.infoGrid}>
+              <View style={styles.infoItem}><MaterialCommunityIcons name="map-marker-outline" size={16} color="#666" /><Text style={styles.infoLabel}>Ubicación:</Text><Text style={styles.infoValue}>{ticket.location || 'No especificada'}</Text></View>
+              <View style={styles.infoItem}><MaterialCommunityIcons name="calendar-outline" size={16} color="#666" /><Text style={styles.infoLabel}>Creado:</Text><Text style={styles.infoValue}>{formatDate(ticket.createdAt)}</Text></View>
+              <View style={styles.infoItem}><MaterialCommunityIcons name="account-outline" size={16} color="#666" /><Text style={styles.infoLabel}>Creado por:</Text><Text style={styles.infoValue}>{ticket.createdByName}</Text></View>
             </View>
           </Card.Content>
         </Card>
-      )}
-    </ScrollView>
+
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title style={styles.sectionTitle}>Comentarios ({comments.length})</Title>
+            {comments.length === 0 ? <View style={styles.emptyComments}><MaterialCommunityIcons name="comment-multiple-outline" size={32} color="#ccc" /><Text style={styles.emptyCommentsText}>No hay comentarios</Text></View> : comments.map(c => (
+              <View key={c.id} style={styles.commentItem}>
+                <View style={styles.commentHeader}><Avatar.Text size={32} label={c.userName.charAt(0)} /><View style={styles.commentInfo}><Text style={styles.commentAuthor}>{c.userName}</Text><Text style={styles.commentDate}>{formatDate(c.createdAt)}</Text></View></View>
+                <Paragraph style={styles.commentContent}>{c.content}</Paragraph>
+              </View>
+            ))}
+            <Divider style={styles.divider} />
+            <View style={styles.addCommentContainer}>
+              <TextInput label="Agregar comentario" value={newComment} onChangeText={setNewComment} mode="outlined" multiline numberOfLines={3} style={styles.commentInput} />
+              <Button mode="contained" onPress={handleAddComment} loading={isAddingComment} disabled={!newComment.trim() || isAddingComment} style={styles.addCommentButton}>Agregar</Button>
+            </View>
+          </Card.Content>
+        </Card>
+
+        {user?.role === 'admin' && (
+          <Card style={styles.card}>
+            <Card.Content>
+              <Title style={styles.cardTitle}>Acciones de Administrador</Title>
+              <View style={styles.actionGrid}>
+                  <Menu
+                      visible={priorityMenuVisible}
+                      onDismiss={() => setPriorityMenuVisible(false)}
+                      anchor={<Button mode="outlined" onPress={() => setPriorityMenuVisible(true)} icon="arrow-up-circle-outline" style={styles.actionButton} textColor="#2E7D32">Prioridad: {ticket.priority}</Button>}
+                  >
+                      {TICKET_PRIORITIES.map(p => <Menu.Item key={p.value} onPress={() => { handleUpdate({ priority: p.value }); setPriorityMenuVisible(false);}} title={p.label} />)}
+                  </Menu>
+                  {ticket.status !== 'resolved' && <Button mode="contained" onPress={() => handleUpdate({ status: 'resolved' })} style={[styles.actionButton, {backgroundColor: '#1B5E20'}]} icon="check" textColor="white">Resolver</Button>}
+                  {ticket.status !== 'in_progress' && <Button mode="outlined" onPress={() => handleUpdate({ status: 'in_progress' })} style={styles.actionButton} icon="play" textColor="#2E7D32">En Progreso</Button>}
+                  <Button mode="outlined" onPress={handleDelete} style={[styles.actionButton, styles.deleteButton]} icon="trash-can-outline" textColor="#B00020">Eliminar</Button>
+              </View>
+            </Card.Content>
+          </Card>
+        )}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#F5F5F5' },
-    scrollContent: { paddingBottom: 100, flexGrow: 1 }, // Aumentado padding y añadido flexGrow
+    mainContainer: { flex: 1, height: '100%', backgroundColor: '#F5F5F5' }, // Contenedor principal con altura fija
+    scrollView: { flex: 1 }, // ScrollView ocupa todo el espacio disponible del padre
+    scrollContent: { paddingBottom: 100, flexGrow: 1 },
     loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F5F5F5' },
     loadingText: { fontSize: 16, color: '#666', marginTop: 16 },
     header: { backgroundColor: 'white', padding: 16, elevation: 2 },
