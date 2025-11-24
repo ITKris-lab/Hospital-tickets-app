@@ -5,11 +5,7 @@ import {
   StyleSheet,
   Alert,
   Platform,
-<<<<<<< HEAD
   FlatList,
-=======
-  FlatList, // Usamos FlatList en lugar de ScrollView
->>>>>>> 99efbda3ba8772a95a1910b4ff6f55273289e207
 } from 'react-native';
 import {
   Card,
@@ -31,10 +27,6 @@ import { doc, onSnapshot, collection, addDoc, updateDoc, serverTimestamp, orderB
 import { db } from '../firebaseConfig';
 import { Ticket, Comment, User, TicketStatus, TicketPriority, TicketCategory } from '../types';
 
-<<<<<<< HEAD
-=======
-// Constantes (sin cambios)
->>>>>>> 99efbda3ba8772a95a1910b4ff6f55273289e207
 const TICKET_CATEGORIES: { value: TicketCategory; label: string; icon: keyof typeof MaterialCommunityIcons.glyphMap }[] = [
   { value: 'hardware', label: 'Hardware', icon: 'memory' },
   { value: 'software', label: 'Software', icon: 'apps' },
@@ -92,10 +84,6 @@ export default function TicketDetailScreen({ user }: TicketDetailScreenProps) {
         const data = doc.data();
         setTicket({ id: doc.id, ...data, createdAt: data.createdAt?.toDate() ?? new Date(), updatedAt: data.updatedAt?.toDate() ?? new Date() } as Ticket);
       } else {
-<<<<<<< HEAD
-=======
-        // Si el documento no existe (fue eliminado), volvemos atrás
->>>>>>> 99efbda3ba8772a95a1910b4ff6f55273289e207
         if (navigation.canGoBack()) {
            navigation.goBack();
         }
@@ -142,10 +130,6 @@ export default function TicketDetailScreen({ user }: TicketDetailScreenProps) {
     if (!ticket) return;
     try {
       await deleteDoc(doc(db, 'tickets', ticket.id));
-<<<<<<< HEAD
-=======
-      // Navegación explícita tras eliminar
->>>>>>> 99efbda3ba8772a95a1910b4ff6f55273289e207
       navigation.goBack(); 
     } catch (error) { 
       console.error(error);
@@ -157,20 +141,12 @@ export default function TicketDetailScreen({ user }: TicketDetailScreenProps) {
     if (!ticket) return;
     setAdminMenuVisible(false);
 
-<<<<<<< HEAD
-=======
-    // En Web usamos window.confirm para mayor compatibilidad
->>>>>>> 99efbda3ba8772a95a1910b4ff6f55273289e207
     if (Platform.OS === 'web') {
       const confirm = window.confirm("¿Estás seguro de eliminar este ticket? Esta acción no se puede deshacer.");
       if (confirm) {
         performDelete();
       }
     } else {
-<<<<<<< HEAD
-=======
-      // En Móvil usamos Alert nativo
->>>>>>> 99efbda3ba8772a95a1910b4ff6f55273289e207
       Alert.alert("Eliminar Ticket", "¿Estás seguro? Esta acción no se puede deshacer.", [
         { text: "Cancelar", style: "cancel" },
         {
@@ -198,10 +174,6 @@ export default function TicketDetailScreen({ user }: TicketDetailScreenProps) {
   const statusTextColor = isColorLight(statusColor) ? '#000' : '#FFF';
   const priorityTextColor = isColorLight(priorityColor) ? '#000' : '#FFF';
 
-<<<<<<< HEAD
-=======
-  // Componente para la cabecera de la lista (Info del Ticket)
->>>>>>> 99efbda3ba8772a95a1910b4ff6f55273289e207
   const renderHeader = () => (
     <View>
       <Surface style={styles.header}>
@@ -265,10 +237,6 @@ export default function TicketDetailScreen({ user }: TicketDetailScreenProps) {
     </View>
   );
 
-<<<<<<< HEAD
-=======
-  // Renderizado de cada comentario (Item de la lista)
->>>>>>> 99efbda3ba8772a95a1910b4ff6f55273289e207
   const renderCommentItem = ({ item }: { item: Comment }) => (
     <Card style={[styles.card, styles.commentCard]}>
       <Card.Content>
@@ -284,10 +252,6 @@ export default function TicketDetailScreen({ user }: TicketDetailScreenProps) {
     </Card>
   );
 
-<<<<<<< HEAD
-=======
-  // Componente para el pie de la lista (Input de nuevo comentario)
->>>>>>> 99efbda3ba8772a95a1910b4ff6f55273289e207
   const renderFooter = () => (
     <Card style={styles.card}>
       <Card.Content>
@@ -321,13 +285,8 @@ export default function TicketDetailScreen({ user }: TicketDetailScreenProps) {
         data={comments}
         keyExtractor={(item) => item.id}
         renderItem={renderCommentItem}
-<<<<<<< HEAD
-        ListHeaderComponent={renderHeader()} // SE PASA EL RESULTADO DE LA FUNCIÓN
-        ListFooterComponent={renderFooter()} // SE PASA EL RESULTADO DE LA FUNCIÓN
-=======
-        ListHeaderComponent={renderHeader}
-        ListFooterComponent={renderFooter}
->>>>>>> 99efbda3ba8772a95a1910b4ff6f55273289e207
+        ListHeaderComponent={renderHeader()}
+        ListFooterComponent={renderFooter()}
         contentContainerStyle={styles.listContent}
       />
     </View>

@@ -20,6 +20,7 @@ import {
 } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { useNavigation } from '@react-navigation/native'; // Importar useNavigation
 import { db } from '../firebaseConfig';
 import { User } from '../types';
 
@@ -29,6 +30,7 @@ interface ProfileScreenProps {
 }
 
 export default function ProfileScreen({ user, onLogout }: ProfileScreenProps) {
+  const navigation = useNavigation(); // Hook de navegación
   const [isEditing, setIsEditing] = useState(false);
   const [editedName, setEditedName] = useState('');
   const [editedSector, setEditedSector] = useState('');
@@ -115,6 +117,22 @@ export default function ProfileScreen({ user, onLogout }: ProfileScreenProps) {
           </View>
         </View>
       </Surface>
+
+      {/* Botón de Administración visible solo para admins */}
+      {user.role === 'admin' && (
+        <Card style={[styles.card, { borderColor: '#2E7D32', borderWidth: 1 }]}>
+          <Card.Content>
+            <Button 
+              mode="contained" 
+              icon="shield-account" 
+              onPress={() => navigation.navigate('Admin' as never)}
+              style={{ backgroundColor: '#2E7D32' }}
+            >
+              Panel de Administración
+            </Button>
+          </Card.Content>
+        </Card>
+      )}
 
       <Card style={styles.card}>
         <Card.Content>
