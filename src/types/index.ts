@@ -43,10 +43,11 @@ export interface Comment {
 }
 
 export type TicketCategory = 
-  | 'equipment'
-  | 'it'
-  | 'maintenance'
-  | 'cleaning'
+  | 'hardware'
+  | 'software'
+  | 'network'
+  | 'printer'
+  | 'user_support'
   | 'other';
 
 export type TicketPriority = 'low' | 'medium' | 'high';
