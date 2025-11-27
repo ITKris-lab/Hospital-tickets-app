@@ -5,6 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
 import {
   Card,
@@ -80,14 +81,20 @@ export default function ProfileScreen({ user, onLogout }: ProfileScreenProps) {
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      'Cerrar Sesión',
-      '¿Estás seguro de que quieres cerrar sesión?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        { text: 'Cerrar Sesión', onPress: onLogout, style: 'destructive' },
-      ]
-    );
+    if (Platform.OS === 'web') {
+      if (window.confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        onLogout();
+      }
+    } else {
+      Alert.alert(
+        'Cerrar Sesión',
+        '¿Estás seguro de que quieres cerrar sesión?',
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Cerrar Sesión', onPress: onLogout, style: 'destructive' },
+        ]
+      );
+    }
   };
 
   // CAMBIO AQUÍ: 'Paciente' -> 'Usuario Básico'
