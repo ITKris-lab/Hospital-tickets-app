@@ -71,6 +71,31 @@ export default function CreateTicketScreen({ user }: CreateTicketScreenProps) {
     }
   };
 
+  // Función específica para web: usar un input type="file" invisible
+  const pickImageWeb = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e: any) => {
+      const file = e.target.files[0];
+      if (file) {
+        const uri = URL.createObjectURL(file);
+        setImageUri(uri);
+        // Guardamos el blob directamente en una propiedad temporal para luego subirlo
+        // Aunque en la web, fetch(uri) debería funcionar para obtener el blob si es un blob: URL
+      }
+    };
+    input.click();
+  };
+
+  const handlePickImage = () => {
+    if (Platform.OS === 'web') {
+      pickImageWeb();
+    } else {
+      pickImage();
+    }
+  };
+
   const uploadImage = async (uri: string) => {
     try {
       const response = await fetch(uri);
@@ -168,7 +193,7 @@ export default function CreateTicketScreen({ user }: CreateTicketScreenProps) {
                   </TouchableOpacity>
                 </View>
               ) : (
-                <Button mode="outlined" onPress={pickImage} icon="camera" style={styles.uploadButton}>
+                <Button mode="outlined" onPress={handlePickImage} icon="camera" style={styles.uploadButton}>
                   Adjuntar Foto
                 </Button>
               )}
